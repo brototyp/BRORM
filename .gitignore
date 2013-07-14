@@ -16,3 +16,7 @@ profile
 *.moved-aside
 DerivedData
 .idea/
+/Pods/
+/BROrm.xcworkspace/xcuserdata
+/BROrm.xcodeproj/xcuserdata
+/BROrm.xcodeproj/project.xcworkspace/xcuserdata
