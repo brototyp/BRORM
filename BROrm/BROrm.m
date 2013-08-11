@@ -137,10 +137,10 @@ static NSString *_idColumn = @"identifier";
 
 - (NSDictionary*)findOneAsDictionary:(NSString *)identifier{
     if(_isRawQuery){
-        return [[self findManyAsDictionaries] firstObject];
+        return [[self findManyAsDictionaries] objectAtIndex:0];
     } else {
         _limit = @(1);
-        return [[self findManyAsDictionaries] firstObject];
+        return [[self findManyAsDictionaries] objectAtIndex:0];
     }
 }
 
