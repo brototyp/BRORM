@@ -7,6 +7,14 @@ Another Objective-C SQLite ORM
 Usage
 ====
 
+Installation
+----
+
+You can install `BRORM` via Cocoapod. Just add the following line to your Podfile.
+```objectivec
+pod 'BRORM', '~> 0.1'
+```
+
 Setup
 ----
 I am using [FMDB](https://github.com/ccgus/fmdb) as SQLite wrapper.
@@ -139,6 +147,5 @@ NSArray *customer = [[t hasMany:@"Customer" through:@"customer_person" withForei
 
 Todo
 ====
-- write podspec
 - write better documentation
 - add having, offset and group by
