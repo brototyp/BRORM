@@ -233,7 +233,7 @@
     NSArray *stillAll = [w findMany];
     XCTAssertTrue(([all count]-[stillAll count])==0, @"Anzahl ist falsch.");
     
-    [w addOrderBy:@"int" withOrdering:@"ASC"];
+    [w orderBy:@"int" withOrdering:@"ASC"];
     w.limit = @1;
     NSArray *justOne = [w findMany];
     XCTAssertTrue(([justOne count])==1, @"Anzahl ist falsch.");

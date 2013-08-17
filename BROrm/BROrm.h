@@ -65,10 +65,10 @@
 - (void)whereLike:(NSString*)column value:(id)value;
 - (void)whereNotLike:(NSString*)column value:(id)value;
 
-- (void)addJoinType:(NSString*)type onTable:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias;
-- (void)addJoin:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias;
+- (void)joinType:(NSString*)type onTable:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias;
+- (void)join:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias;
 
-- (void)addOrderBy:(NSString*)column withOrdering:(NSString*)ordering;
+- (void)orderBy:(NSString*)column withOrdering:(NSString*)ordering;
 
 // -----------------------------------------------------------------------------
 // write

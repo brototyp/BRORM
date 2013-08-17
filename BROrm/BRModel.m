@@ -82,7 +82,7 @@
     Class joinclass = NSClassFromString(className);
     
     BROrmWrapper *w = [BROrmWrapper factoryForClassName:className andDatabaseQueue:_orm.databaseQueue];
-    [w addJoin:jointable withConstraints:@[@{
+    [w join:jointable withConstraints:@[@{
                                                @"type":@"=",
                                                @"column":[NSString stringWithFormat:@"%@.%@",jointable,foreignKey],
                                                @"value":[NSString stringWithFormat:@"%@.%@",[joinclass getTableName],[joinclass idColumn]],

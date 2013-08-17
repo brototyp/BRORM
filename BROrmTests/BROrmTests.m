@@ -106,7 +106,7 @@
     BROrm *orm = [BROrm forTable:@"testtable"];
     [orm select:@"testtable.identifier" as:@"id"];
     [orm select:@"jointable.string" as:@"joinstring"];
-    [orm addJoin:@"jointable" withConstraints:@[@{@"type":@"=",@"column":@"testtable.identifier",@"value":@"jointable.foreign_key",
+    [orm join:@"jointable" withConstraints:@[@{@"type":@"=",@"column":@"testtable.identifier",@"value":@"jointable.foreign_key",
                                                   @"trust_value":@(1)}] andAlias:@"jointable"];
     BROrm *result = [orm findOne:NULL];
     XCTAssertNotNil(result[@"joinstring"], @"");

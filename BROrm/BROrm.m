@@ -225,18 +225,18 @@ static NSString *_idColumn = @"identifier";
     [self whereType:@"NOT LIKE" column:column value:value];
 }
 
-- (void)addJoinType:(NSString*)type onTable:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias{
+- (void)joinType:(NSString*)type onTable:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias{
     [_joins addObject:@{
                         @"type":type,
                         @"table":table,
                         @"constraints":constraints,
                         @"alias":alias}];
 }
-- (void)addJoin:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias{
-    [self addJoinType:@"" onTable:table withConstraints:constraints andAlias:alias];
+- (void)join:(NSString*)table withConstraints:(NSArray*)constraints andAlias:(NSString*)alias{
+    [self joinType:@"" onTable:table withConstraints:constraints andAlias:alias];
 }
 
-- (void)addOrderBy:(NSString*)column withOrdering:(NSString*)ordering{
+- (void)orderBy:(NSString*)column withOrdering:(NSString*)ordering{
     [_orders addObject:@{
                          @"column":column,
                          @"ordering":ordering}];
