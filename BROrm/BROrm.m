@@ -27,6 +27,9 @@
     NSMutableArray *_whereConditions;
     NSMutableArray *_joins;
     NSMutableArray *_orders;
+    NSMutableArray *_groups;
+    
+    NSString *_havingExpression;
 }
 
 
@@ -47,6 +50,7 @@ static NSString *_idColumn = @"identifier";
         _joins = [NSMutableArray array];
         _orders = [NSMutableArray array];
         _dirtyFields = [NSMutableArray array];
+        _groups = [NSMutableArray array];
     }
     return self;
 }
@@ -242,9 +246,14 @@ static NSString *_idColumn = @"identifier";
                          @"ordering":ordering}];
 }
 
-// TODO: add Having
-// TODO: add Offset
-// TODO: add Group by
+
+- (void)groupBy:(NSString*)column{
+    [_groups addObject:column];
+}
+
+- (void)having:(NSString*)expression{
+    _havingExpression = expression;
+}
 
 
 #pragma mark writing
@@ -369,13 +378,13 @@ static NSString *_idColumn = @"identifier";
     }
     return [@[
               [self buildSelectStart],
-               [self buildJoin],
-               [self buildWhere],
-//               $this->_build_group_by(),
-//               $this->_build_having(),
-               [self buildOrderBy],
-               [self buildLimit],
-               [self buildOffset],
+              [self buildJoin],
+              [self buildWhere],
+              [self buildGroupBy],
+              [self buildHaving],
+              [self buildOrderBy],
+              [self buildLimit],
+              [self buildOffset],
               ] componentsJoinedByString:@" "];
 }
 
@@ -404,9 +413,9 @@ static NSString *_idColumn = @"identifier";
         if([join objectForKey:@"alias"])
             [tablestring stringByAppendingString:[NSString stringWithFormat:@"AS %@",[join objectForKey:@"alias"]]];
         [joins addObject:[NSString stringWithFormat:@"%@ JOIN %@ ON (%@)",
-                     [join objectForKey:@"type"],
-                     [join objectForKey:@"table"],
-                     conditionstring]];
+                          [join objectForKey:@"type"],
+                          [join objectForKey:@"table"],
+                          conditionstring]];
     }
     return [joins componentsJoinedByString:@" "];
 }
@@ -452,6 +461,20 @@ static NSString *_idColumn = @"identifier";
     _parameters = m_parameters;
     if([conditionsarray count] == 0) return @"";
     return [conditionsarray componentsJoinedByString:@" AND "];
+}
+
+- (NSString*)buildGroupBy{
+    if([_groups count] == 0) return @"";
+    NSString *groupByString = @"GROUP BY ";
+    
+    groupByString = [groupByString stringByAppendingString:[_groups componentsJoinedByString:@","]];
+    
+    return groupByString;
+}
+
+- (NSString*)buildHaving{
+    if(!_havingExpression || [_groups count] == 0) return @"";
+    return [@"HAVING " stringByAppendingString:_havingExpression];
 }
 
 - (NSArray*)run{

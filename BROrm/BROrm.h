@@ -70,6 +70,9 @@
 
 - (void)orderBy:(NSString*)column withOrdering:(NSString*)ordering;
 
+- (void)groupBy:(NSString*)column;
+- (void)having:(NSString*)expression;
+
 // -----------------------------------------------------------------------------
 // write
 - (id)create;

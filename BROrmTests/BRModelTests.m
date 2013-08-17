@@ -240,4 +240,30 @@
     XCTAssertEqual([justOne[0][@"int"] intValue], 2, @"Falsches Element");
 }
 
+- (void)testGroupBy{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
+    [w select:@"testtable_identifier" as:@"ttid"];
+    [w select:@"count(*)" as:@"count"];
+    [w groupBy:@"testtable_identifier"];
+    NSArray *all = [w findMany];
+    XCTAssertTrue(([all count])==2, @"Anzahl ist falsch.");
+}
+
+- (void)testHaving{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
+    [w having:@"testtable_identifier = 2"];
+    NSArray *stillAll = [w findMany];
+    XCTAssertTrue(([stillAll count])==3, @"Anzahl ist falsch.");
+}
+
+- (void)testGroupByAndHaving{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
+    [w select:@"testtable_identifier" as:@"ttid"];
+    [w select:@"count(*)" as:@"count"];
+    [w groupBy:@"testtable_identifier"];
+    [w having:@"testtable_identifier = 2"];
+    NSArray *all = [w findMany];
+    XCTAssertTrue(([all count])==1, @"Anzahl ist falsch.");
+}
+
 @end
