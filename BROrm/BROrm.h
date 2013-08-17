@@ -17,6 +17,7 @@
 @property (nonatomic,retain) NSString *tableName;
 @property (nonatomic,retain) NSString *tableAlias;
 @property (nonatomic,retain) NSNumber *limit;
+@property (nonatomic,retain) NSNumber *offset;
 @property (nonatomic,readwrite) BOOL *distinct;
 
 

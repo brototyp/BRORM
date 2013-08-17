@@ -44,14 +44,14 @@
 - (void)testObject
 {
     BRSegmentedString *sest = [[BRSegmentedString alloc] initWithString:@"(a|b)&a|b|c"];
-    XCTAssertEquals(sest.type, BRNodeTypeOr, @"");
-    XCTAssertEquals(sest.left.type, BRNodeTypeAnd, @"");
-    XCTAssertEquals(sest.left.left.type, BRNodeTypeOr, @"");
-    XCTAssertEquals(sest.left.left.left.type, BRNodeTypeValue, @"");
-    XCTAssertEquals(sest.left.left.right.type, BRNodeTypeValue, @"");
-    XCTAssertEquals(sest.right.type, BRNodeTypeOr, @"");
-    XCTAssertEquals(sest.right.left.type, BRNodeTypeValue, @"");
-    XCTAssertEquals(sest.right.right.type, BRNodeTypeValue, @"");
+    XCTAssertEqual(sest.type, BRNodeTypeOr, @"");
+    XCTAssertEqual(sest.left.type, BRNodeTypeAnd, @"");
+    XCTAssertEqual(sest.left.left.type, BRNodeTypeOr, @"");
+    XCTAssertEqual(sest.left.left.left.type, BRNodeTypeValue, @"");
+    XCTAssertEqual(sest.left.left.right.type, BRNodeTypeValue, @"");
+    XCTAssertEqual(sest.right.type, BRNodeTypeOr, @"");
+    XCTAssertEqual(sest.right.left.type, BRNodeTypeValue, @"");
+    XCTAssertEqual(sest.right.right.type, BRNodeTypeValue, @"");
 }
 
 @end

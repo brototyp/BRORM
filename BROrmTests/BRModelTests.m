@@ -219,4 +219,25 @@
     success = [testentry save]; //should not save anything, since nothing changed
 }
 
+- (void)testLimit{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
+    w.limit = @1;
+    NSArray *testentries = [w findMany];
+    XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
+}
+
+- (void)testOffset{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
+    NSArray *all = [w findMany];
+    w.offset = @1;
+    NSArray *stillAll = [w findMany];
+    XCTAssertTrue(([all count]-[stillAll count])==0, @"Anzahl ist falsch.");
+    
+    [w addOrderBy:@"int" withOrdering:@"ASC"];
+    w.limit = @1;
+    NSArray *justOne = [w findMany];
+    XCTAssertTrue(([justOne count])==1, @"Anzahl ist falsch.");
+    XCTAssertEqual([justOne[0][@"int"] intValue], 2, @"Falsches Element");
+}
+
 @end

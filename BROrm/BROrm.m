@@ -375,7 +375,7 @@ static NSString *_idColumn = @"identifier";
 //               $this->_build_having(),
                [self buildOrderBy],
                [self buildLimit],
-//               $this->_build_offset(),
+               [self buildOffset],
               ] componentsJoinedByString:@" "];
 }
 
@@ -414,6 +414,11 @@ static NSString *_idColumn = @"identifier";
 - (NSString*)buildLimit{
     if(!_limit) return @"";
     return [NSString stringWithFormat:@"LIMIT %i",[_limit intValue]];
+}
+
+- (NSString*)buildOffset{
+    if(!_offset || !_limit) return @"";
+    return [NSString stringWithFormat:@"OFFSET %i",[_offset intValue]];
 }
 
 - (NSString*)buildWhere{
