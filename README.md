@@ -145,7 +145,37 @@ Person *t = (Person*)[w findOne:@"1"];
 NSArray *customer = [[t hasMany:@"Customer" through:@"customer_person" withForeignKey:@"customer_identifier" andBaseKey:@"person_identifier"] findMany];
 ```
 
+Limit
+---
+```objectivec
+BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Person"];
+w.limit = @1;
+NSArray *testentries = [w findMany];
+```
+
+Offset
+---
+```objectivec
+BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Person"];
+[w orderBy:@"int" withOrdering:@"ASC"];
+w.limit = @1;
+w.offset = @1;
+NSArray *justOne = [w findMany];
+```
+
+Group By & Having
+---
+
+```objectivec
+BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Person"];
+[w select:@"prename" as:@"prename"];
+[w select:@"count(*)" as:@"count"];
+[w groupBy:@"prename"];
+[w having:@"age > 21"];
+NSArray *allOverTwentyoneByPrename = [w findMany];
+```
+
+
 Todo
 ====
 - write better documentation
-- add having, offset and group by
