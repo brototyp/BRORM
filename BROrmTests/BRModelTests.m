@@ -11,6 +11,16 @@
 #import "FMDatabaseQueue.h"
 
 
+@interface Nonconform : BRModel
+@end
+
+@implementation Nonconform
++ (NSString*)idColumn{
+    return @"id";
+}
+
+@end
+
 @interface Singer : BRModel
 
 @end
@@ -85,6 +95,9 @@
     [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(2),@(3)]];
     [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(3),@(1)]];
     [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(3),@(2)]];
+    
+    
+    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS nonconform (id INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT);" withArgumentsInArray:NULL];
 }
 
 - (void)tearDown
@@ -114,6 +127,13 @@
     [w whereEquals:@"int" value:@(5)];
     t = (BRTesttable*)[w findOne];
     XCTAssertTrue([t[@"string"] isEqualToString:@"string 5"], @"Wurde nicht korrekt gespeichert");
+}
+
+- (void)testCreateNonconform{
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Nonconform"];
+    Nonconform *t = [w create:@{@"string":@"string 5"}];
+    XCTAssertTrue([t save], @"Konnte nicht gespeichert werden.");
+    XCTAssertNotNil(t[@"id"], @"ID-Column wurde nicht korrekt übernommen");
 }
 
 - (void)testFindManyClass{

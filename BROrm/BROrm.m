@@ -317,8 +317,10 @@ static NSString *_idColumn = @"identifier";
         } else {
             success = [BROrm executeUpdate:query withArgumentsInArray:values inDatabaseQueue:_databaseQueue withLockBlock:^(FMDatabase *db){
                 if(_isNew){
-                    [_data setObject:[NSNumber numberWithInteger:[db lastInsertRowId]] forKey:_idColumn];
+                    _lastInsertRowId = @([db lastInsertRowId]);
                     _isNew = NO;
+                } else {
+                    _lastInsertRowId = NULL;
                 }
             }];
         }

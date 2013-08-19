@@ -38,7 +38,13 @@
 }
 
 - (BOOL)save{
-    return [_orm save];
+    if(![_orm save]) return FALSE;
+    
+    if(_orm.lastInsertRowId){
+        NSString *idcolumn = [[self class] idColumn];
+        _orm[idcolumn] = _orm.lastInsertRowId;
+    }
+    return YES;
 }
 
 - (BOOL)destroy{
