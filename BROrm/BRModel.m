@@ -77,7 +77,7 @@
 
 - (BROrmWrapper*)hasOneOrMany:(NSString*)className withForeignKey:(NSString*)foreignKey{
     BROrmWrapper *w = [BROrmWrapper factoryForClassName:className andDatabaseQueue:_orm.databaseQueue];
-    [w whereEquals:[NSString stringWithFormat:@"%@.%@",className,foreignKey] value:self[[[self class] idColumn]]];
+    [w whereEquals:[NSString stringWithFormat:@"%@.%@",[NSClassFromString(className) getTableName],foreignKey] value:self[[[self class] idColumn]]];
     
     return w;
 }
