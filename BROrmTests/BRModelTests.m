@@ -12,14 +12,6 @@
 
 #define CLASSNAMES @[@"DefaultClass",@"CustomClass"]
 
-@interface DefaultClass : BRModel
-@end
-
-
-@implementation DefaultClass
-
-@end
-
 @interface CustomClass : BRModel
 
 @end
@@ -230,7 +222,7 @@
 
 - (void)testHasOneOrMany{
     BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"DefaultClass"];
-    DefaultClass *d = (DefaultClass*)[w findOne:@"1"];
+    BRModel *d = [w findOne:@"1"];
     NSArray *objects = [[d hasOneOrMany:@"DefaultClass"] findMany];
     XCTAssertTrue([objects count]==2, @"Anzahl ist falsch.");
     

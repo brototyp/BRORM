@@ -9,6 +9,7 @@
 #import "BRModel.h"
 #import "BROrm.h"
 #import "FMDatabaseQueue.h"
+#import "objc/runtime.h"
 
 #import "NSString+Inflections.h"
 
@@ -117,6 +118,10 @@
     BROrmWrapper *orm = [[BROrmWrapper alloc] init];
     if(orm){
         Class class = NSClassFromString(classname);
+        if(class == NULL){
+            class = objc_allocateClassPair(objc_getClass("BRModel"), [classname UTF8String], 0);
+            objc_registerClassPair(class);
+        }
         orm.tableName = [class getTableName];
         orm.databaseQueue = databaseQueue;
         orm.className = classname;
