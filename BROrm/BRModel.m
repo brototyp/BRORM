@@ -33,17 +33,13 @@
     self = [super init];
     if(self){
         _orm = orm;
+        _orm.idColumn = [[self class] idColumn];
     }
     return self;
 }
 
 - (BOOL)save{
     if(![_orm save]) return FALSE;
-    
-    if(_orm.lastInsertRowId){
-        NSString *idcolumn = [[self class] idColumn];
-        _orm[idcolumn] = _orm.lastInsertRowId;
-    }
     return YES;
 }
 
@@ -124,6 +120,7 @@
         orm.tableName = [class getTableName];
         orm.databaseQueue = databaseQueue;
         orm.className = classname;
+        orm.idColumn = [class idColumn];
     }
     return orm;
 }
@@ -133,7 +130,8 @@
 }
 
 - (id)findOne:(NSString*)identifier{
-    return [self createModelInstance:[super findOne:identifier]];
+    [self whereEquals:[NSString stringWithFormat:@"%@.%@",[NSClassFromString([self className]) getTableName],[NSClassFromString([self className]) idColumn]] value:identifier];
+    return [self createModelInstance:[super findOne:NULL]];
 }
 
 - (NSArray*)findMany{

@@ -18,7 +18,7 @@
 @property (nonatomic,retain) NSString *tableAlias;
 @property (nonatomic,retain) NSNumber *limit;
 @property (nonatomic,retain) NSNumber *offset;
-@property (nonatomic,readonly) NSNumber *lastInsertRowId;
+@property (nonatomic,retain) NSString *idColumn;
 @property (nonatomic,readwrite) BOOL *distinct;
 
 
@@ -35,8 +35,6 @@
 
 + (FMDatabaseQueue*)defaultQueue;
 + (void)setDefaultQueue:(FMDatabaseQueue*)databaseQueue;
-
-+ (NSString*)idColumn;
 
 - (id)objectForKeyedSubscript:(id <NSCopying>)key;
 - (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;

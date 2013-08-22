@@ -10,56 +10,28 @@
 #import "BRModel.h"
 #import "FMDatabaseQueue.h"
 
+#define CLASSNAMES @[@"DefaultClass",@"CustomClass"]
 
-@interface Nonconform : BRModel
+@interface DefaultClass : BRModel
 @end
 
-@implementation Nonconform
-+ (NSString*)idColumn{
-    return @"id";
-}
 
-@end
-
-@interface Singer : BRModel
+@implementation DefaultClass
 
 @end
 
-@implementation Singer
+@interface CustomClass : BRModel
 
 @end
 
-@interface Person : BRModel
-
-@end
-
-@interface BRTesttable : BRModel
-
-@end
-
-@implementation BRTesttable
+@implementation CustomClass
 
 + (NSString*)getTableName{
-    return @"testtable";
+    return @"custom_class_table";
 }
 
-- (void)addSinger:(NSArray*)singer{
-    
-    NSMutableArray *objects = [@[] mutableCopy];
-    
-    for (Singer *asinger in singer) {
-        
-        BROrmWrapper *w = [self hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"];
-        [w whereEquals:@"singer.identifier" value:asinger[@"identifier"]];
-        if([w findOne]==NULL){
-            BROrm *orm = [BROrm forTable:@"singer_test"];
-            [orm create:@{@"singer_identifier":asinger[@"identifier"],
-                          @"testtable_identifier":self[@"identifier"]}];
-            [objects addObject:orm];
-        }
-    }
-    
-    [BROrm transactionSaveObjects:objects inDatabaseQueue:self.orm.databaseQueue];
++ (NSString*)idColumn{
+    return @"id_column";
 }
 
 @end
@@ -78,212 +50,209 @@
     _databaseQueue = [FMDatabaseQueue databaseQueueWithPath:[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"test.sqlite"]];
     [BROrm setDefaultQueue:_databaseQueue];
     
-    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS testtable (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, int INTEGER);" withArgumentsInArray:NULL];
-    [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[@"string 1",@(1)]];
-    [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[@"string 2",@(2)]];
-    [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[@"string 3",@(3)]];
+    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS default_class (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, int INTEGER, default_class_identifier INTEGER);" withArgumentsInArray:NULL];
+    [BROrm executeUpdate:@"INSERT INTO default_class (string, int, default_class_identifier) VALUES (?,?,?)" withArgumentsInArray:@[@"string 1",@(1),@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO default_class (string, int, default_class_identifier) VALUES (?,?,?)" withArgumentsInArray:@[@"string 2",@(1),@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO default_class (string, int, default_class_identifier) VALUES (?,?,?)" withArgumentsInArray:@[@"string 3",@(2),@(2)]];
     
-    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS singer (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, testtable_identifier INTEGER);" withArgumentsInArray:NULL];
-    [BROrm executeUpdate:@"INSERT INTO singer (string, testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@"string 1",@(1)]];
-    [BROrm executeUpdate:@"INSERT INTO singer (string, testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@"string 2",@(1)]];
-    [BROrm executeUpdate:@"INSERT INTO singer (string, testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@"string 3",@(2)]];
-    
-    
-    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS singer_test (identifier INTEGER PRIMARY KEY AUTOINCREMENT, singer_identifier INTEGER, testtable_identifier INTEGER);" withArgumentsInArray:NULL];
-    [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(1),@(1)]];
-    [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(1),@(2)]];
-    [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(2),@(3)]];
-    [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(3),@(1)]];
-    [BROrm executeUpdate:@"INSERT INTO singer_test (singer_identifier,testtable_identifier) VALUES (?,?)" withArgumentsInArray:@[@(3),@(2)]];
-    
-    
-    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS nonconform (id INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT);" withArgumentsInArray:NULL];
+    [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS custom_class_table (id_column INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, int INTEGER, custom_class_table_foreign_key INTEGER);" withArgumentsInArray:NULL];
+    [BROrm executeUpdate:@"INSERT INTO custom_class_table (string, int, custom_class_table_foreign_key) VALUES (?,?,?)" withArgumentsInArray:@[@"string 1",@(1),@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO custom_class_table (string, int, custom_class_table_foreign_key) VALUES (?,?,?)" withArgumentsInArray:@[@"string 2",@(1),@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO custom_class_table (string, int, custom_class_table_foreign_key) VALUES (?,?,?)" withArgumentsInArray:@[@"string 3",@(2),@(2)]];
 }
 
 - (void)tearDown
 {
-    
     NSFileManager *fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"test.sqlite"] error:NULL];
     [super tearDown];
 }
 
-- (void)testClassDiscovery
+#pragma mark automatic tests
+
+- (void)testAutoClassDiscovery
 {
-    NSArray *classnames = @[@"Person",@"SomeBody"];
-    
-    for (NSString *classname in classnames) {
+    for (NSString *classname in CLASSNAMES) {
         BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
         XCTAssertTrue([w.className isEqualToString:classname], @"%@ wird nicht korrekt erkannt, war: %@",classname,w.className);
     }
 }
 
-- (void)testCreate{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *t = [w create:@{@"string":@"string 5",@"int":@(5)}];
-    XCTAssertTrue([t save], @"Konnte nicht gespeichert werden.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereEquals:@"int" value:@(5)];
-    t = (BRTesttable*)[w findOne];
-    XCTAssertTrue([t[@"string"] isEqualToString:@"string 5"], @"Wurde nicht korrekt gespeichert");
+- (void)testAutoCreate{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        BRModel *object = [w create:@{@"string":@"string",@"int":@10}];
+        XCTAssertNotNil(w, @"BROrmWrapper wasn't created properly");
+        XCTAssertNotNil(object, @"BRModel wasn't created properly");
+        XCTAssertTrue([object save], @"wasn't able to save");
+        XCTAssertNotNil(object[[[object class] idColumn]], @"idColumn wasn't set properly");
+        XCTAssertTrue([object[@"string"] isEqualToString:@"string"], @"string wasn't saved properly");
+        XCTAssertTrue([object[@"int"] intValue] == 10, @"string wasn't saved properly");
+    }
 }
 
-- (void)testCreateNonconform{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Nonconform"];
-    Nonconform *t = [w create:@{@"string":@"string 5"}];
-    XCTAssertTrue([t save], @"Konnte nicht gespeichert werden.");
-    XCTAssertNotNil(t[@"id"], @"ID-Column wurde nicht korrekt übernommen");
+- (void)testAutoUpdate{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        BRModel *first = [w findOne];
+        first[@"string"] = @"teststring";
+        XCTAssertTrue([first save], @"unable to save");
+        first = [w findOne];
+        XCTAssertTrue([first[@"string"] isEqualToString:@"teststring"], @"field wasn't updated");
+    }
 }
 
-- (void)testFindManyClass{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    NSArray *testentries = [w findMany];
-    BRTesttable *first = testentries[0];
-    XCTAssertTrue([first isKindOfClass:[BRTesttable class]], @"Klasse ist falsch.");
+- (void)testAutoFindMany{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        NSArray *objects = [w findMany];
+        BRModel *first = objects[0];
+        XCTAssertTrue([first isKindOfClass:[NSClassFromString(classname) class]], @"Class is wrong");
+        XCTAssertTrue([objects count] == 3, @"Number of objects is wrong");
+    }
 }
 
-- (void)testSimpleRead{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    NSArray *testentries = [w findMany];
-    XCTAssertTrue([testentries count]==3, @"Anzahl ist falsch.");
+
+- (void)testAutoFindById{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        BRModel *object = [w findOne:@(2)];
+        XCTAssertNotNil(object, @"Object wasn't red properly");
+        NSLog(@"%@",[[object class] idColumn]);
+        NSLog(@"%i",[object[[[object class] idColumn]] intValue]);
+        XCTAssertTrue([object[[[object class] idColumn]] intValue]==2, @"Wrong object selected");
+    }
+}
+- (void)testAutoLimit{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        w.limit = @1;
+        NSArray *testentries = [w findMany];
+        XCTAssertTrue([testentries count]==1, @"wrong count");
+    }
 }
 
-- (void)testFindById{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *testentry = (BRTesttable*)[w findOne:@(2)];
-    XCTAssertTrue([testentry[@"identifier"] intValue]==2, @"Abfrage ist so nicht korrekt.");
+- (void)testAutoOffset{
+    for (NSString *classname in CLASSNAMES) {
+        NSString *idColum = [NSClassFromString(classname) idColumn];
+        
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        [w orderBy:@"int" withOrdering:@"ASC"];
+        NSArray *all = [w findMany];
+        w.offset = @1;
+        NSArray *stillAll = [w findMany];
+        XCTAssertTrue([all count]==[stillAll count], @"wrong count");
+        
+        BRModel *second = all[1];
+        NSUInteger secondId = [second[idColum] intValue];
+        
+        w.limit = @1;
+        NSArray *justOne = [w findMany];
+        XCTAssertTrue(([justOne count])==1, @"wrong count");
+        XCTAssertTrue([justOne[0][idColum] intValue] == secondId, @"wrong Element");
+    }
 }
 
-- (void)testFindByWhereFilter{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereLike:@"string" value:@"string%"];
-    NSArray *testentries = [w findMany];
-    XCTAssertTrue([testentries count]==3, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==3, @"Anzahl ist falsch.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereLike:@"string" value:@"%3"];
-    testentries = [w findMany];
-    XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereNotLike:@"string" value:@"%3"];
-    testentries = [w findMany];
-    XCTAssertTrue([testentries count]==2, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==2, @"Anzahl ist falsch.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereEquals:@"string" value:@"string 1"];
-    testentries = [w findMany];
-    XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereNotEquals:@"string" value:@"string 1"];
-    testentries = [w findMany];
-    XCTAssertTrue([testentries count]==2, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==2, @"Anzahl ist falsch.");
-    
-    w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    [w whereIdIs:@(1)];
-    testentries = [w findMany];
-    XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
-    XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
+
+- (void)testAutoGroupBy{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        [w select:@"int" as:@"int"];
+        [w select:@"count(*)" as:@"count"];
+        [w groupBy:@"int"];
+        NSArray *all = [w findMany];
+        XCTAssertTrue(([all count])==2, @"wrong count");
+    }
+}
+
+- (void)testAutoHaving{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        [w having:@"int = 2"];
+        NSArray *stillAll = [w findMany];
+        XCTAssertTrue(([stillAll count])==3, @"wrong count");
+    }
+}
+
+- (void)testAutoGroupByAndHaving{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        [w select:@"int" as:@"int"];
+        [w select:@"count(*)" as:@"count"];
+        [w groupBy:@"int"];
+        [w having:@"int = 2"];
+        NSArray *all = [w findMany];
+        XCTAssertTrue(([all count])==1, @"wrong count");
+    }
+}
+
+- (void)testAutoFindByWhereFilter{
+    for (NSString *classname in CLASSNAMES) {
+        BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
+        [w whereLike:@"string" value:@"string%"];
+        NSArray *testentries = [w findMany];
+        XCTAssertTrue([testentries count]==3, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==3, @"Anzahl ist falsch.");
+        
+        w = [BROrmWrapper factoryForClassName:classname];
+        [w whereLike:@"string" value:@"%3"];
+        testentries = [w findMany];
+        XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
+        
+        w = [BROrmWrapper factoryForClassName:classname];
+        [w whereNotLike:@"string" value:@"%3"];
+        testentries = [w findMany];
+        XCTAssertTrue([testentries count]==2, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==2, @"Anzahl ist falsch.");
+        
+        w = [BROrmWrapper factoryForClassName:classname];
+        [w whereEquals:@"string" value:@"string 1"];
+        testentries = [w findMany];
+        XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
+        
+        w = [BROrmWrapper factoryForClassName:classname];
+        [w whereNotEquals:@"string" value:@"string 1"];
+        testentries = [w findMany];
+        XCTAssertTrue([testentries count]==2, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==2, @"Anzahl ist falsch.");
+        
+        w = [BROrmWrapper factoryForClassName:classname];
+        [w whereIdIs:@(1)];
+        testentries = [w findMany];
+        XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
+        XCTAssertTrue([w count]==1, @"Anzahl ist falsch.");
+    }
 }
 
 - (void)testHasOneOrMany{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *t = (BRTesttable*)[w findOne:@"1"];
-    NSArray *singer = [[t hasOneOrMany:@"Singer"] findMany];
-    XCTAssertTrue([singer count]==2, @"Anzahl ist falsch.");
+    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"DefaultClass"];
+    DefaultClass *d = (DefaultClass*)[w findOne:@"1"];
+    NSArray *objects = [[d hasOneOrMany:@"DefaultClass"] findMany];
+    XCTAssertTrue([objects count]==2, @"Anzahl ist falsch.");
     
-    t = (BRTesttable*)[w findOne:@"2"];
-    Singer *asinger = (Singer*)[[t hasOneOrMany:@"Singer"] findOne];
-    XCTAssertTrue(asinger, @"Wurde nicht gefunden.");
+    w = [BROrmWrapper factoryForClassName:@"CustomClass"];
+    CustomClass *c = (CustomClass*)[w findOne:@"1"];
+    objects = [[c hasOneOrMany:@"CustomClass" withForeignKey:@"custom_class_table_foreign_key"] findMany];
+    XCTAssertTrue([objects count]==2, @"Anzahl ist falsch.");
 }
 
-- (void)testHasAndBelongsToMany{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *t = (BRTesttable*)[w findOne:@"1"];
-    NSArray *singer = [[t hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"] findMany];
-    XCTAssertTrue([singer count]==2, @"Anzahl ist falsch.");
-    
-    t = (BRTesttable*)[w findOne:@"3"];
-    Singer *asinger = (Singer*)[[t hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"] findOne];
-    XCTAssertTrue(asinger, @"Wurde nicht gefunden.");
-    
-}
+// TODO: add test for lazy save
+// TODO: add test for transactional save
+// TODO: add test for hasAndBelongsToMany
 
-- (void)testTransactionSave{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *t = (BRTesttable*)[w findOne:@"1"];
-    
-    NSArray *singer = [[BROrmWrapper factoryForClassName:@"Singer"] findMany];
-    [t addSinger:singer];
-    
-    singer = [[t hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"] findMany];
-    XCTAssertTrue([singer count]==3, @"Anzahl ist falsch.");
-}
+//- (void)testHasAndBelongsToMany{
+//    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
+//    BRTesttable *t = (BRTesttable*)[w findOne:@"1"];
+//    NSArray *singer = [[t hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"] findMany];
+//    XCTAssertTrue([singer count]==2, @"Anzahl ist falsch.");
+//
+//    t = (BRTesttable*)[w findOne:@"3"];
+//    Singer *asinger = (Singer*)[[t hasMany:@"Singer" through:@"singer_test" withForeignKey:@"singer_identifier" andBaseKey:@"testtable_identifier"] findOne];
+//    XCTAssertTrue(asinger, @"Wurde nicht gefunden.");
+//
+//}
 
-- (void)testSimpleLazySave{
-    // Dieser Test kann so nicht überprüft werden
-    // Um das hier zu prüfen bitte in die jeweiligen Methoden Breakpoints machen
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    BRTesttable *testentry = (BRTesttable*)[w findOne:@"2"];
-    testentry[@"string"] = testentry[@"string"];
-    BOOL success = [testentry save]; //should not save anything, since nothing changed
-    
-    testentry[@"string"] = @"string 2";
-    success = [testentry save]; //should not save anything, since nothing changed
-}
-
-- (void)testLimit{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    w.limit = @1;
-    NSArray *testentries = [w findMany];
-    XCTAssertTrue([testentries count]==1, @"Anzahl ist falsch.");
-}
-
-- (void)testOffset{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"BRTesttable"];
-    NSArray *all = [w findMany];
-    w.offset = @1;
-    NSArray *stillAll = [w findMany];
-    XCTAssertTrue(([all count]-[stillAll count])==0, @"Anzahl ist falsch.");
-    
-    [w orderBy:@"int" withOrdering:@"ASC"];
-    w.limit = @1;
-    NSArray *justOne = [w findMany];
-    XCTAssertTrue(([justOne count])==1, @"Anzahl ist falsch.");
-    XCTAssertEqual([justOne[0][@"int"] intValue], 2, @"Falsches Element");
-}
-
-- (void)testGroupBy{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
-    [w select:@"testtable_identifier" as:@"ttid"];
-    [w select:@"count(*)" as:@"count"];
-    [w groupBy:@"testtable_identifier"];
-    NSArray *all = [w findMany];
-    XCTAssertTrue(([all count])==2, @"Anzahl ist falsch.");
-}
-
-- (void)testHaving{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
-    [w having:@"testtable_identifier = 2"];
-    NSArray *stillAll = [w findMany];
-    XCTAssertTrue(([stillAll count])==3, @"Anzahl ist falsch.");
-}
-
-- (void)testGroupByAndHaving{
-    BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Singer"];
-    [w select:@"testtable_identifier" as:@"ttid"];
-    [w select:@"count(*)" as:@"count"];
-    [w groupBy:@"testtable_identifier"];
-    [w having:@"testtable_identifier = 2"];
-    NSArray *all = [w findMany];
-    XCTAssertTrue(([all count])==1, @"Anzahl ist falsch.");
-}
 
 @end

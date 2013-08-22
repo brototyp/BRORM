@@ -123,7 +123,6 @@
                   @"string":@"foo",
                   @"int":@(1)}];
     [orm save];
-    orm[@"identifier"] = orm.lastInsertRowId;
     
     
     BROrm *orm2 = [BROrm forTable:@"testtable"];

@@ -38,13 +38,13 @@
 @end
 
 static FMDatabaseQueue *_defaultQueue = NULL;
-static NSString *_idColumn = @"identifier";
 
 @implementation BROrm
 
 - (id)init{
     self = [super init];
     if(self){
+        _idColumn = @"identifier";
         _columns = [NSMutableArray array];
         _whereConditions = [NSMutableArray array];
         _joins = [NSMutableArray array];
@@ -130,10 +130,6 @@ static NSString *_idColumn = @"identifier";
 
 + (FMDatabaseQueue*)defaultQueue{
     return _defaultQueue;
-}
-
-+ (NSString*)idColumn{
-    return _idColumn;
 }
 
 #pragma mark -
@@ -317,10 +313,8 @@ static NSString *_idColumn = @"identifier";
         } else {
             success = [BROrm executeUpdate:query withArgumentsInArray:values inDatabaseQueue:_databaseQueue withLockBlock:^(FMDatabase *db){
                 if(_isNew){
-                    _lastInsertRowId = @([db lastInsertRowId]);
+                    _data[_idColumn] = @([db lastInsertRowId]);
                     _isNew = NO;
-                } else {
-                    _lastInsertRowId = NULL;
                 }
             }];
         }
