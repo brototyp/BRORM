@@ -74,7 +74,9 @@
 {
     for (NSString *classname in CLASSNAMES) {
         BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
-        XCTAssertTrue([w.className isEqualToString:classname], @"%@ wird nicht korrekt erkannt, war: %@",classname,w.className);
+        XCTAssertTrue([w.idColumn isEqualToString:[NSClassFromString(classname) idColumn]], @"idColumn isn't copied to the BRORM object");
+        XCTAssertTrue([w.tableName isEqualToString:[NSClassFromString(classname) getTableName]], @"tableName isn't copied to the BRORM object");
+        XCTAssertTrue([w.className isEqualToString:classname], @"%@ is falsely %@",classname,w.className);
     }
 }
 
