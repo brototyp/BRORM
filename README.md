@@ -25,6 +25,12 @@ _databaseQueue = [FMDatabaseQueue databaseQueueWithPath:databasePath];
 [BROrm setDefaultQueue:_databaseQueue];
 ```
 
+Add your migrations for the database.
+
+``` objectivec
+[BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS default_class (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, int INTEGER, default_class_identifier INTEGER);" withArgumentsInArray:NULL];
+```
+
 Create a subclass of BRModel for each Model u want to use.
 
 - Per default the `tableName` is the underscored classname. Override `+ (NSString*)getTableName` if you want to change it. 
