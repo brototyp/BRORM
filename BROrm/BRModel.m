@@ -47,14 +47,12 @@
 - (BOOL)destroy{
     NSString *idcolumn = [[self class] idColumn];
     return [BROrm executeUpdate:[NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ = ?",[[self class] getTableName],idcolumn]
-           withArgumentsInArray:self[idcolumn]
+           withArgumentsInArray:@[self[idcolumn]]
                 inDatabaseQueue:_orm.databaseQueue];
 }
 
-// TODO: delete
 
-
-//#pragma mark key subscripting
+#pragma mark key subscripting
 - (id)objectForKeyedSubscript:(id <NSCopying>)key{
     return _orm[key];
 }
