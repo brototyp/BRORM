@@ -49,26 +49,23 @@
 - (void)testForTableInDatabase
 {
     BROrm *orm = [BROrm forTable:@"testtable"];
-    XCTAssertNotNil(orm, @"BROrm Objekt kann nicht erstellt werden.");
-    XCTAssertEqualObjects(orm.databaseQueue, _databaseQueue, @"FMDatabaseQueue wird nicht korrekt übernommen.");
+    XCTAssertNotNil(orm, @"BROrm object can't be created.");
+    XCTAssertEqualObjects(orm.databaseQueue, _databaseQueue, @"FMDatabaseQueue isn't used.");
 }
 
 - (void)testForRawQueryFindMany{
     BROrm *orm = [BROrm forTable:@"testtable"];
-    [orm rawQuery:@"SELECT * FROM testtable" withParameters:NULL];
     NSArray *result = [orm findMany];
     XCTAssertTrue([result count] == 1, @"");
 }
 
 - (void)testForRawQueryFindOne{
     BROrm *orm = [BROrm forTable:@"testtable"];
-    [orm rawQuery:@"SELECT * FROM testtable" withParameters:NULL];
     BROrm *result = [orm findOne:NULL];
     XCTAssertNotNil(result, @"");
 }
 - (void)testForRawQueryCount{
     BROrm *orm = [BROrm forTable:@"testtable"];
-    [orm rawQuery:@"SELECT * FROM testtable" withParameters:NULL];
     int result = [orm count];
     XCTAssertTrue(result == 1, @"");
 }
@@ -129,13 +126,30 @@
     [orm2 select:@"*" as:NULL];
     [orm2 whereEquals:@"identifier" value:orm[@"identifier"]];
     BROrm *result = [orm2 findOne:NULL];
-    XCTAssertEqualObjects(orm[@"string"], @"foo", @"Insert klappt nicht");
+    XCTAssertEqualObjects(orm[@"string"], @"foo", @"Insert is not working");
     
     [orm setObject:@"bar" forKeyedSubscript:@"string"];
     [orm save];
     
     result = [orm2 findOne:NULL];
-    XCTAssertEqualObjects(result[@"string"], @"bar", @"Update klappt nicht");
+    XCTAssertEqualObjects(result[@"string"], @"bar", @"Update is not working");
+}
+
+#pragma mark tests errors
+- (void)testForNoDatabasequeue{
+    BROrm *orm = [BROrm forTable:NULL];
+    XCTAssertNil(orm, @"BROrm for no table should be NULL");
+    
+    [BROrm setDefaultQueue:NULL];
+    orm = [BROrm forTable:@"testtable"];
+    XCTAssertNil(orm, @"BROrm for a table should be NULL if no database is set");
+}
+
+- (void)testForWrongFinds{
+    BROrm *orm = [[BROrm alloc] init];
+    //[orm rawQuery:@"SELECT * FROM testtable" withParameters:NULL];
+    NSArray *result = [orm findMany];
+    XCTAssertTrue([result count] == 0, @"");
 }
 
 @end
