@@ -368,6 +368,7 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 }
 
 - (NSString*)buildSelect{
+    _parameters = NULL;
     if(_isRawQuery){
         _parameters = _rawParameters;
         return _rawQuery;
