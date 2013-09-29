@@ -102,20 +102,24 @@
     XCTAssertNil(result, @"");
 }
 
+- (void)testForRawWhere{
+    BROrm *orm = [BROrm forTable:@"testtable"];
+    [orm whereRaw:@"(SELECT count(*) from jointable WHERE testtable.identifier = jointable.foreign_key) > 0"];
+    int count = [orm count];
+    
+    XCTAssertTrue(count == 1, @"");
+}
+
 - (void)testForSimpleJoin{
     BROrm *orm = [BROrm forTable:@"testtable"];
     [orm select:@"testtable.identifier" as:@"id"];
     [orm select:@"jointable.string" as:@"joinstring"];
-    [orm join:@"jointable" withConstraints:@[@{@"type":@"=",@"column":@"testtable.identifier",@"value":@"jointable.foreign_key",
-                                                  @"trust_value":@(1)}] andAlias:@"jointable"];
+    [orm join:@"jointable" withConstraints:@[@{@"raw_condition":@"testtable.identifier = jointable.foreign_key"}] andAlias:@"jointable"];
     BROrm *result = [orm findOne:NULL];
     XCTAssertNotNil(result[@"joinstring"], @"");
 }
 
 // TODO: write this test
-//- (void)testForSorting{
-//    XCTAssertNotNil(NULL, @"Fehlender Test");
-//}
 
 - (void)testForCreateAndSave{
     BROrm *orm = [BROrm forTable:@"testtable"];

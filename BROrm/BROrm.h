@@ -56,8 +56,8 @@
 - (void)select:(NSString*)column as:(NSString*)alias;
 - (void)selectExpression:(NSString*)expression as:(NSString*)alias;
 
+- (void)whereRaw:(NSString*)rawCondition;
 - (void)whereType:(NSString*)type column:(NSString*)column value:(id)value;
-- (void)whereType:(NSString*)type column:(NSString*)column value:(id)value trustValue:(BOOL)trust;
 - (void)whereEquals:(NSString*)column value:(id)value;
 - (void)whereNotEquals:(NSString*)column value:(id)value;
 - (void)whereIdIs:(id)value;

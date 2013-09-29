@@ -202,12 +202,11 @@ static FMDatabaseQueue *_defaultQueue = NULL;
     [self addResultColumn:expression as:alias];
 }
 
-- (void)whereType:(NSString*)type column:(NSString*)column value:(id)value{
-    [self whereType:type column:column value:value trustValue:FALSE];
+- (void)whereRaw:(NSString*)rawCondition{
+    [_whereConditions addObject:@{@"raw_condition":rawCondition}];
 }
-
-- (void)whereType:(NSString*)type column:(NSString*)column value:(id)value trustValue:(BOOL)trust{
-    [_whereConditions addObject:@{@"column":column,@"type":type,@"value":value,@"trust_value":@(trust)}];
+- (void)whereType:(NSString*)type column:(NSString*)column value:(id)value{
+    [_whereConditions addObject:@{@"column":column,@"type":type,@"value":value}];
 }
 - (void)whereEquals:(NSString*)column value:(id)value{
     [self whereType:@"=" column:column value:value];
@@ -448,8 +447,8 @@ static FMDatabaseQueue *_defaultQueue = NULL;
     NSMutableArray *m_parameters = [_parameters mutableCopy];
     if(!m_parameters) m_parameters = [@[] mutableCopy];
     for (NSDictionary *condition in conditions) {
-        if([[condition objectForKey:@"trust_value"] boolValue]){
-            [conditionsarray addObject:[NSString stringWithFormat:@"%@ %@ %@",[condition objectForKey:@"column"],[condition objectForKey:@"type"],[condition objectForKey:@"value"]]];
+        if([condition objectForKey:@"raw_condition"]){
+            [conditionsarray addObject:[condition objectForKey:@"raw_condition"]];
         } else {
             [conditionsarray addObject:[NSString stringWithFormat:@"%@ %@ ?",[condition objectForKey:@"column"],[condition objectForKey:@"type"]]];
             [m_parameters addObject:[condition objectForKey:@"value"]];
