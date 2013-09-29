@@ -12,7 +12,7 @@ Installation
 
 You can install `BRORM` via Cocoapod. Just add the following line to your Podfile.
 ```objectivec
-pod 'BRORM', '~> 0.1'
+pod 'BRORM', '~> 0.3'
 ```
 
 Setup
@@ -130,6 +130,7 @@ BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"Person"];
 // [w whereLike:@"prename" value:@"Ja%"];
 // [w whereNotLike:@"prename" value:@"Ja%"];
 // [w whereIdIs:@(1)];
+// [w whereRaw:@"`prename` = `Ja%`"]
 NSArray *jasons = [w findMany];
 ```
 
