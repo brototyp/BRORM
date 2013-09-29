@@ -38,6 +38,11 @@
 @end
 
 static FMDatabaseQueue *_defaultQueue = NULL;
+#ifdef BRORM_LOGGING
+static BOOL _logging = YES;
+#else
+static BOOL _logging = NO;
+#endif
 
 @implementation BROrm
 
@@ -56,10 +61,17 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 }
 
 + (instancetype)forTable:(NSString*)tableName{
-    if(!_defaultQueue) return NULL;
     return [self forTable:tableName inDatabase:_defaultQueue];
 }
 + (instancetype)forTable:(NSString*)tableName inDatabase:(FMDatabaseQueue*)databaseQueue{
+    if(!databaseQueue){
+        if(_logging) NSLog(@"[ERROR:] No databaseQueue given");
+        return NULL;
+    }
+    if(!tableName){
+        if(_logging) NSLog(@"[ERROR:] No tableName given");
+        return NULL;
+    }
     BROrm *orm = [[BROrm alloc] init];
     if(orm){
         orm.tableName = tableName;
@@ -69,7 +81,10 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 }
 
 + (NSArray *)executeQuery:(NSString*)query withArgumentsInArray:(NSArray*)arguments{
-    if(!_defaultQueue) return NULL;
+    if(!_defaultQueue){
+        if(_logging) NSLog(@"[ERROR:] defaultQueue is not set. Use +executeQuery:withAurgumentsInArray:inDatabaseQueue instead");
+        return NULL;
+    }
     return [self executeQuery:query withArgumentsInArray:arguments inDatabaseQueue:_defaultQueue];
 }
 
@@ -149,6 +164,10 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 }
 
 - (BROrm *)findOne:(id)identifier{
+    if(!_tableName){
+        if(_logging) NSLog(@"[ERROR:] No tableName given");
+        return NULL;
+    }
     if(identifier){
         [_whereConditions removeAllObjects];
         [self whereIdIs:identifier];
@@ -163,6 +182,10 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 }
 
 - (NSArray*)findMany{
+    if(!_tableName){
+        if(_logging) NSLog(@"[ERROR:] No tableName given");
+        return NULL;
+    }
     NSArray *many = [self findManyAsDictionaries];
     
     NSMutableArray *returnIt = [@[] mutableCopy];
@@ -475,7 +498,7 @@ static FMDatabaseQueue *_defaultQueue = NULL;
 
 - (NSArray*)run{
     NSString *query = [self buildSelect];
-    NSLog(@"query: %@ with: %@",query,_parameters);
+    if(_logging) NSLog(@"[QUERY:] %@ with: %@",query,_parameters);
     return [BROrm executeQuery:query withArgumentsInArray:_parameters inDatabaseQueue:_databaseQueue];
 }
 
