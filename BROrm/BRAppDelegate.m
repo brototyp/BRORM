@@ -7,6 +7,10 @@
 //
 
 #import "BRAppDelegate.h"
+#import "BRSchoolListViewController.h"
+
+#import <FMDatabaseQueue.h>
+#import "BROrm.h"
 
 @implementation BRAppDelegate
 
@@ -15,6 +19,18 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
+    
+    NSString *databasePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"database.sqlite"];
+    [BROrm setDefaultQueue:[FMDatabaseQueue databaseQueueWithPath:databasePath]];
+    
+    for (NSString *class in @[@"BRSchool",@"BRClass",@"BRStudent"]) {
+        [[NSClassFromString(class) class] performSelector:@selector(migrate)];
+    }
+    
+    BRSchoolListViewController *schoolListViewController = [[BRSchoolListViewController alloc] init];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:schoolListViewController];
+    self.window.rootViewController = nc;
+    
     [self.window makeKeyAndVisible];
     return YES;
 }

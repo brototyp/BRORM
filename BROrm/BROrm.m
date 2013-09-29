@@ -81,7 +81,10 @@ static BOOL _logging = NO;
 }
 
 + (NSArray *)executeQuery:(NSString*)query withArgumentsInArray:(NSArray*)arguments{
-    if(!_defaultQueue) return NULL;
+    if(!_defaultQueue){
+        if(_logging) NSLog(@"[ERROR:] defaultQueue is not set. Use +executeQuery:withAurgumentsInArray:inDatabaseQueue instead");
+        return NULL;
+    }
     return [self executeQuery:query withArgumentsInArray:arguments inDatabaseQueue:_defaultQueue];
 }
 
@@ -495,7 +498,7 @@ static BOOL _logging = NO;
 
 - (NSArray*)run{
     NSString *query = [self buildSelect];
-    NSLog(@"query: %@ with: %@",query,_parameters);
+    if(_logging) NSLog(@"[QUERY:] %@ with: %@",query,_parameters);
     return [BROrm executeQuery:query withArgumentsInArray:_parameters inDatabaseQueue:_databaseQueue];
 }
 
