@@ -12,7 +12,7 @@ Installation
 
 You can install `BRORM` via Cocoapod. Just add the following line to your Podfile.
 ```objectivec
-pod 'BRORM', '~> 0.3'
+pod 'BRORM', '~> 0.4'
 ```
 
 Setup
