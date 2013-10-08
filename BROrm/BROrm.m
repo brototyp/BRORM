@@ -225,6 +225,12 @@ static BOOL _logging = NO;
     [self addResultColumn:expression as:alias];
 }
 
+- (void)whereIsNull:(NSString*)column{
+    [_whereConditions addObject:@{@"raw_condition":[NSString stringWithFormat:@"%@ IS NULL",column]}];
+}
+- (void)whereIsNotNull:(NSString*)column{
+    [_whereConditions addObject:@{@"raw_condition":[NSString stringWithFormat:@"%@ IS NOT NULL",column]}];
+}
 - (void)whereRaw:(NSString*)rawCondition{
     [_whereConditions addObject:@{@"raw_condition":rawCondition}];
 }

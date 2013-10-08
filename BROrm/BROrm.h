@@ -56,6 +56,8 @@
 - (void)select:(NSString*)column as:(NSString*)alias;
 - (void)selectExpression:(NSString*)expression as:(NSString*)alias;
 
+- (void)whereIsNull:(NSString*)column;
+- (void)whereIsNotNull:(NSString*)column;
 - (void)whereRaw:(NSString*)rawCondition;
 - (void)whereType:(NSString*)type column:(NSString*)column value:(id)value;
 - (void)whereEquals:(NSString*)column value:(id)value;

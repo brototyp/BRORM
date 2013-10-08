@@ -32,6 +32,8 @@
     
     [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS testtable (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, int INTEGER);" withArgumentsInArray:NULL];
     [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[@"string",@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[@"string2",@(1)]];
+    [BROrm executeUpdate:@"INSERT INTO testtable (string, int) VALUES (?,?)" withArgumentsInArray:@[[NSNull null],@(1)]];
     
     [BROrm executeUpdate:@"CREATE TABLE IF NOT EXISTS jointable (identifier INTEGER PRIMARY KEY AUTOINCREMENT, string TEXT, foreign_key INTEGER);" withArgumentsInArray:NULL];
     [BROrm executeUpdate:@"INSERT INTO jointable (string, foreign_key) VALUES (?,?)" withArgumentsInArray:@[@"joinstring",@(1)]];
@@ -56,7 +58,7 @@
 - (void)testForRawQueryFindMany{
     BROrm *orm = [BROrm forTable:@"testtable"];
     NSArray *result = [orm findMany];
-    XCTAssertTrue([result count] == 1, @"");
+    XCTAssertTrue([result count] == 3, @"");
 }
 
 - (void)testForRawQueryFindOne{
@@ -67,7 +69,7 @@
 - (void)testForRawQueryCount{
     BROrm *orm = [BROrm forTable:@"testtable"];
     int result = [orm count];
-    XCTAssertTrue(result == 1, @"");
+    XCTAssertTrue(result == 3, @"");
 }
 
 - (void)testForSimpleSelect{
@@ -81,7 +83,7 @@
     BROrm *orm = [BROrm forTable:@"testtable"];
     [orm select:@"identifier" as:@"id"];
     int result = [orm count];
-    XCTAssertTrue(result == 1, @"");
+    XCTAssertTrue(result == 3, @"");
 }
 
 - (void)testForSimpleWhereEquals{
@@ -107,6 +109,17 @@
     XCTAssertTrue(count == 1, @"");
 }
 
+- (void)testForWhereIsNull{
+    BROrm *orm = [BROrm forTable:@"testtable"];
+    [orm whereIsNotNull:@"string"];
+    XCTAssertTrue([orm count] == 2, @"");
+    
+    orm = [BROrm forTable:@"testtable"];
+    [orm whereIsNull:@"string"];
+    XCTAssertTrue([orm count] == 1, @"");
+    
+}
+
 - (void)testForSimpleJoin{
     BROrm *orm = [BROrm forTable:@"testtable"];
     [orm select:@"testtable.identifier" as:@"id"];
@@ -115,8 +128,6 @@
     BROrm *result = [orm findOne:NULL];
     XCTAssertNotNil(result[@"joinstring"], @"");
 }
-
-// TODO: write this test
 
 - (void)testForCreateAndSave{
     BROrm *orm = [BROrm forTable:@"testtable"];
