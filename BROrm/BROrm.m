@@ -361,7 +361,7 @@ static BOOL _logging = NO;
         } else {
             success = [database executeUpdate:query withArgumentsInArray:values];
             if(success){
-                [_data setObject:[NSNumber numberWithLongLong:[database lastInsertRowId]] forKey:_idColumn];
+                [_data setObject:@([database lastInsertRowId]) forKey:_idColumn];
                 _isNew = NO;
             }
         }

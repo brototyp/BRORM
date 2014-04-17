@@ -88,10 +88,10 @@
 - (void)testAutoUpdate{
     for (NSString *classname in CLASSNAMES) {
         BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
-        BRModel *first = [w findOne];
+        BRModel *first = (BRModel *)[w findOne];
         first[@"string"] = @"teststring";
         XCTAssertTrue([first save], @"unable to save");
-        first = [w findOne];
+        first = (BRModel *)[w findOne];
         XCTAssertTrue([first[@"string"] isEqualToString:@"teststring"], @"field wasn't updated");
     }
 }
@@ -110,7 +110,7 @@
 - (void)testAutoFindById{
     for (NSString *classname in CLASSNAMES) {
         BROrmWrapper *w = [BROrmWrapper factoryForClassName:classname];
-        BRModel *object = [w findOne:@(2)];
+        BRModel *object = (BRModel *)[w findOne:@(2)];
         XCTAssertNotNil(object, @"Object wasn't red properly");
         NSLog(@"%@",[[object class] idColumn]);
         NSLog(@"%i",[object[[[object class] idColumn]] intValue]);
@@ -222,7 +222,7 @@
 
 - (void)testHasOneOrMany{
     BROrmWrapper *w = [BROrmWrapper factoryForClassName:@"DefaultClass"];
-    BRModel *d = [w findOne:@"1"];
+    BRModel *d = (BRModel *)[w findOne:@"1"];
     NSArray *objects = [[d hasOneOrMany:@"DefaultClass"] findMany];
     XCTAssertTrue([objects count]==2, @"Anzahl ist falsch.");
     
